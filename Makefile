@@ -30,7 +30,7 @@ push:
 # Docker convenience recipes for testing the running container:
 .PHONY: healthcheck
 healthcheck:
-	time curl -w "%{http_code}\n" -- localhost:3000/mutant
+	curl -w "%{http_code}\n" -- localhost:3000/
 .PHONY: stats
 stats:
 	time curl -w "%{http_code}\n" -- localhost:3000/stats
