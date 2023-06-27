@@ -8,7 +8,7 @@ default: ;
 
 # Docker convenience recipes:
 .PHONY: build
-build: http mutant
+build:
 	docker build \
 		-t mutant:$$(date -u +"%Y%m%d%H%M%S") \
 		-t mutant:latest \
