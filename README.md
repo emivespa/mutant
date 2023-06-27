@@ -3,58 +3,53 @@
 [Challenge found here](https://github.com/mauricionrgarcia/examen-mercadolibre-mutante)
 (see README).
 
-## Part 1 - isMutant method
-
-- [ ] is there a non log(n) way to do it?
-
-### Current assumptions
-
-- DNA strands are 6 characters long
-- a match is 4 identical characters in a row
-- we're being passed 6 strands exactly
-- we're looking for 2 matches
+## mutant.IsMutant method
 
 ### Efficiency notes
 
-- go is plenty fast
-- we return early whenever possible
-  - tuple check returns early as soon as it knows it's not a match
-  - passes return early once we've reached the mutant threshhold
-  - isMutant returns early whenever a pass returns 0 matches left
-  - **doesn't actually matter all that much for such a small input,
-    the worst case still tests at 0.00s**
+- We don't do an initial pass to collect al possible n-tuples.
+- ~All checks are done in place.~
+  - Excuse me, all checks _could_ be done in place,
+    if we were ok with replacing the `checkLine` function with a fixed-length check like this:
+    ```go
+    if [i][j] == [i][j+1] && [i][j] == [i][j+2] && [i][j] == [i][j+2]
+    ```
+- We always return early as soon as possible.
+  - Not that it matters all that much, the human test cases, where we go through all possible
+    tuples, are still pretty fast.
 
-### Another possible approach
+## REST API
 
-- generate list of all possible 4-tuples
-  - transpose the array to get the vertical ones(?)
-  - not sure whether there's an elegant way to do the diagonals,
-    but it's certainly possible
-- pass them all to the same function
-- why not
-  - would technically be slower - adds a pass to do pretty much the same
-  - program logic would not be all that different
+- Go http server running on ECS
+  - Might convert it to a Lambda soon.
 
-## Part 2 - rest API
+Currently hosted at
 
-Currently hosted at `http://mutant.emivespa.com/stats`
-
-Wasn't sure whether to go with a container or a lambda. Went with a container.
+- `http://mutant.emivespa.com/`
+- `http://mutant.emivespa.com/stats`
+- `http://mutant.emivespa.com/mutant`
 
 <!-- Heard at "[¿Qué tal es trabajar en MERCADO LIBRE?](https://www.youtube.com/watch?v=6DpwMKNqoPk)" -->
 
 ### Building and running
 
 The Makefile contains convenience recipes for building and running the container with all the right flags,
-so you can run
-`make build`, and then
-`make run`.
-You can also run
-`make healthcheck`,
-`make 200` and
-`make 403`
-to test the running container.
+so you can run:
 
-## Part 3 - database
+- `make build` and then
+- `make run`
 
-- [ ] part 3 - database
+There are also convenience recipes for hitting container endpoints:
+
+- `make 200`
+- `make 403`
+- `make healthcheck`
+- `make stats`
+
+For now, won't work without a running DB.
+
+## DB
+
+- Using Planetscale because setting up RDS would be a distraction.
+- Might be the shoddiest part of this, it's my first time using Prisma with
+  Golang.
