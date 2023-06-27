@@ -53,7 +53,7 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 					log.Println("error creating row:", err)
 				}
 				res, _ := json.Marshal(createdMutantCandidate)
-				log.Println("ereated row:", string(res))
+				log.Println("created row:", string(res))
 			} else if err != nil {
 				log.Printf("error occurred: %s", err)
 			} else {
