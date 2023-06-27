@@ -1,13 +1,11 @@
 package mutant
 
-import "log"
-
 // We don't do an initial pass to collect al possible n-tuples.
-// We always return early whenever possible.
 // ~All checks are done in place.~
 // Excuse me, all checks --could-- be done in place,
 // if we were ok with replacing the checkLine function with something like this:
 //	[i][j] == [i][j+1] && [i][j] == [i][j+2] && [i][j] == [i][j+2]
+// We always return early as soon as we get 2 matches.
 
 const (
 	mutantThreshhold int = 2
@@ -43,7 +41,6 @@ func checkLine(dnaPtr *[]string, i, j, iOffset, jOffset int) bool {
 			return false
 		}
 	}
-	log.Println("hit:", i, j, string((*dnaPtr)[i][j]))
 	return true
 }
 
@@ -76,7 +73,7 @@ func checkColumns(dna []string, strandsLeft int) int {
 }
 
 func checkDiagonals(dna []string, strandsLeft int) int {
-	for i := 0; i <= len(dna[i])-matchLength; i++ {
+	for i := 0; i <= len(dna)-matchLength; i++ {
 		for j := 0; j <= len(dna[i])-matchLength; j++ {
 			if checkLine(&dna, i, j, 1, 1) {
 				strandsLeft--
@@ -91,7 +88,7 @@ func checkDiagonals(dna []string, strandsLeft int) int {
 
 func checkContradiagonals(dna []string, strandsLeft int) int {
 	for i := 0; i <= len(dna)-matchLength; i++ {
-		for j := matchLength - 1; j < len(dna); j++ {
+		for j := matchLength - 1; j < len(dna[i]); j++ {
 			if checkLine(&dna, i, j, 1, -1) {
 				strandsLeft--
 				if strandsLeft == 0 {
