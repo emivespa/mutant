@@ -58,12 +58,20 @@ stats:
 		-d '' \
 		-w "%{http_code}\n" \
 		-- localhost:3000/mutant
+.PHONY: random
+random:
+	time curl \
+		-H "Content-Type: application/json" \
+		-X POST \
+		-d "$$(go run random_dna/main.go)" \
+		-w "%{http_code}\n" \
+		-- localhost:3000/mutant
 .PHONY: custom
 custom:
 	command -v vipe
 	time curl \
 		-H "Content-Type: application/json" \
 		-X POST \
-		-d "$$(echo '{"dna":["ATGCGA","CAGTGC","TTATTT","AGACGG","GCGTCA","TCACTG"]}' | vipe)" \
+		-d "$$(go run random_dna/main.go | vipe)" \
 		-w "%{http_code}\n" \
 		-- localhost:3000/mutant
