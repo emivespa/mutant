@@ -51,5 +51,5 @@ For now, won't work without a running DB.
 ## DB
 
 - Using Planetscale because setting up RDS would be a distraction.
-- Might be the shoddiest part of this, it's my first time using Prisma with
-  Golang.
+- ~Might be the shoddiest part of this, it's my first time using Prisma with Golang.~
+- single DB query for both /mutant and /stats
