@@ -1,13 +1,14 @@
-# Use an official Go runtime as a parent image
-FROM golang:1.21rc2-alpine3.18
+FROM golang:1.20.5-bookworm
+# Note on image tags: golang:*-alpine* has no git, which go-get uses,
+# so unless you `apk add git`, it might throw a related error.
 
 WORKDIR /app
 
 COPY go.mod go.sum ./
 RUN go mod download
 
-# prefetch the binaries, so that they will be cached and not downloaded on each change
-# https://goprisma.org/docs/reference/deploy/docker
+# Prefetch the binaries, so that they will be cached and not downloaded on each change
+# (see https://goprisma.org/docs/reference/deploy/docker):
 RUN go run github.com/steebchen/prisma-client-go prefetch
 
 COPY . /app
