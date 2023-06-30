@@ -9,3 +9,5 @@ require (
 	github.com/steebchen/prisma-client-go v0.18.0
 	github.com/takuoki/gocase v1.0.0
 )
+
+require golang.org/x/text v0.10.0 // indirect
