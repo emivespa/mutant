@@ -1,3 +1,5 @@
+// chatgpt generated
+
 package main
 
 import (
