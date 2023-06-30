@@ -15,7 +15,6 @@ func main() {
 }
 
 func run() error {
-	// Establish DB connection, https://goprisma.org/docs/getting-started/quickstart
 	client := db.NewClient()
 	if err := client.Prisma.Connect(); err != nil {
 		return err

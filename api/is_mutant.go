@@ -1,11 +1,4 @@
-package mutant
-
-// We don't do an initial pass to collect al possible n-tuples.
-// ~All checks are done in place.~
-// Excuse me, all checks --could-- be done in place,
-// if we were ok with replacing the checkLine function with something like this:
-//	[i][j] == [i][j+1] && [i][j] == [i][j+2] && [i][j] == [i][j+2]
-// We always return early as soon as we get 2 matches.
+package main
 
 const (
 	mutantThreshhold int = 2

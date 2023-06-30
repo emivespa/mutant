@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/emivespa/mutant/prisma/db"
 )
@@ -21,9 +22,12 @@ func statsHandler(client *db.PrismaClient, ctx context.Context) func(w http.Resp
 		var err error
 		var mutantCountResult []map[string]string
 		var humanCountResult []map[string]string
+		opCtx, cancel := context.WithTimeout(ctx, time.Second*30)
+		defer cancel()
+
 		err = client.Prisma.QueryRaw(
 			"SELECT count(*) FROM `MutantCandidate` WHERE isMutant = true LIMIT 1",
-		).Exec(ctx, &mutantCountResult)
+		).Exec(opCtx, &mutantCountResult)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -31,7 +35,7 @@ func statsHandler(client *db.PrismaClient, ctx context.Context) func(w http.Resp
 		}
 		err = client.Prisma.QueryRaw(
 			"SELECT count(*) FROM `MutantCandidate` WHERE isMutant = false LIMIT 1",
-		).Exec(ctx, &humanCountResult)
+		).Exec(opCtx, &humanCountResult)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -57,7 +61,6 @@ func statsHandler(client *db.PrismaClient, ctx context.Context) func(w http.Resp
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		// Set the response header and send the JSON data
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(jsonData)

@@ -42,7 +42,7 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 		dnaString := string(dnaBytes)
 
 		go func() {
-			opCtx, cancel := context.WithTimeout(ctx, time.Second*30)
+			opCtx, cancel := context.WithTimeout(ctx, time.Second*10)
 			defer cancel()
 			_, err := client.MutantCandidate.FindFirst(
 				db.MutantCandidate.DnaString.Equals(string(dnaString)),
