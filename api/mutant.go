@@ -6,8 +6,8 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
-	"github.com/emivespa/mutant/mutant"
 	"github.com/emivespa/mutant/prisma/db"
 )
 
@@ -18,6 +18,7 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 			w.WriteHeader(http.StatusMethodNotAllowed)
 			return
 		}
+
 		var req Request
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
@@ -26,7 +27,7 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 			return
 		}
 
-		isMutant := mutant.IsMutant(req.Dna)
+		isMutant := IsMutant(req.Dna)
 
 		if isMutant {
 			w.WriteHeader(http.StatusOK)
@@ -41,14 +42,16 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 		dnaString := string(dnaBytes)
 
 		go func() {
+			opCtx, cancel := context.WithTimeout(ctx, time.Second*30)
+			defer cancel()
 			_, err := client.MutantCandidate.FindFirst(
 				db.MutantCandidate.DnaString.Equals(string(dnaString)),
-			).Exec(ctx)
+			).Exec(opCtx)
 			if errors.Is(err, db.ErrNotFound) {
 				createdMutantCandidate, err := client.MutantCandidate.CreateOne(
 					db.MutantCandidate.DnaString.Set(string(dnaString)),
 					db.MutantCandidate.IsMutant.Set(isMutant),
-				).Exec(ctx)
+				).Exec(opCtx)
 				if err != nil {
 					log.Println("error creating row:", err)
 				}
