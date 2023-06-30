@@ -3,7 +3,7 @@
 [Challenge found here](https://github.com/mauricionrgarcia/examen-mercadolibre-mutante)
 (see README).
 
-## mutant.IsMutant method
+## IsMutant method
 
 ### Efficiency notes
 
@@ -15,21 +15,18 @@
     if [i][j] == [i][j+1] && [i][j] == [i][j+2] && [i][j] == [i][j+2]
     ```
 - We always return early as soon as possible.
-  - Not that it matters all that much, the human test cases, where we go through all possible
-    tuples, are still pretty fast.
 
 ## REST API
 
-- Go http server running on ECS
+- Go http server running on ECS.
   - Might convert it to a Lambda soon.
+  - Currently hosted at:
+    - `http://mutant.emivespa.com/stats`
+    - `http://mutant.emivespa.com/mutant`
 
-Currently hosted at
+### Assumptions
 
-- `http://mutant.emivespa.com/`
-- `http://mutant.emivespa.com/stats`
-- `http://mutant.emivespa.com/mutant`
-
-<!-- Heard at "[¿Qué tal es trabajar en MERCADO LIBRE?](https://www.youtube.com/watch?v=6DpwMKNqoPk)" -->
+- We should return 200/403 regardless of whether the mutant candidate is already in the DB.
 
 ### Building and running
 
@@ -38,11 +35,13 @@ so you can run:
 
 - `make build` and then
 - `make run`
+- `make push`
 
 There are also convenience recipes for hitting container endpoints:
 
-- `make 200`
-- `make 403`
+- `make 200` for a mutant
+- `make 403` for a non-mutant
+- `make random` for random dna
 - `make healthcheck`
 - `make stats`
 
