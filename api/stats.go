@@ -20,29 +20,24 @@ func statsHandler(client *db.PrismaClient, ctx context.Context) func(w http.Resp
 		}
 
 		var err error
-		var mutantCountResult []map[string]string
-		var humanCountResult []map[string]string
+		var countResult []map[string]interface{}
 		opCtx, cancel := context.WithTimeout(ctx, time.Second*30)
 		defer cancel()
 
 		err = client.Prisma.QueryRaw(
-			"SELECT count(*) FROM `MutantCandidate` WHERE isMutant = true LIMIT 1",
-		).Exec(opCtx, &mutantCountResult)
+			"SELECT isMutant, count(*) FROM `MutantCandidate` GROUP BY isMutant",
+		).Exec(opCtx, &countResult)
 		if err != nil {
 			log.Println(err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		err = client.Prisma.QueryRaw(
-			"SELECT count(*) FROM `MutantCandidate` WHERE isMutant = false LIMIT 1",
-		).Exec(opCtx, &humanCountResult)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-		mutantCount, _ := strconv.Atoi(mutantCountResult[0]["count(*)"])
-		humanCount, _ := strconv.Atoi(humanCountResult[0]["count(*)"])
+		log.Println(countResult)
+
+		mutantCountStr := countResult[0]["count(*)"].(string)
+		humanCountStr := countResult[1]["count(*)"].(string)
+		mutantCount, _ := strconv.Atoi(mutantCountStr)
+		humanCount, _ := strconv.Atoi(humanCountStr)
 
 		ratio := -1.0
 		if humanCount != 0 {
@@ -50,8 +45,8 @@ func statsHandler(client *db.PrismaClient, ctx context.Context) func(w http.Resp
 		}
 
 		data := map[string]interface{}{
-			"count_mutant_dna": mutantCount,
-			"count_human_dna":  humanCount,
+			"count_mutant_dna": mutantCountStr,
+			"count_human_dna":  humanCountStr,
 			"ratio":            ratio,
 		}
 

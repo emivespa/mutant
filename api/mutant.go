@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -44,23 +44,16 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 		go func() {
 			opCtx, cancel := context.WithTimeout(ctx, time.Second*10)
 			defer cancel()
-			_, err := client.MutantCandidate.FindFirst(
+			upsertedMutantCandidate, err := client.MutantCandidate.UpsertOne(
 				db.MutantCandidate.DnaString.Equals(string(dnaString)),
-			).Exec(opCtx)
-			if errors.Is(err, db.ErrNotFound) {
-				createdMutantCandidate, err := client.MutantCandidate.CreateOne(
-					db.MutantCandidate.DnaString.Set(string(dnaString)),
-					db.MutantCandidate.IsMutant.Set(isMutant),
-				).Exec(opCtx)
-				if err != nil {
-					log.Println("error creating row:", err)
-				}
-				res, _ := json.Marshal(createdMutantCandidate)
-				log.Println("created row:", string(res))
-			} else if err != nil {
+			).Create(
+				db.MutantCandidate.DnaString.Set(string(dnaString)),
+				db.MutantCandidate.IsMutant.Set(isMutant),
+			).Update().Exec(opCtx)
+			if err != nil {
 				log.Printf("error occurred: %s", err)
 			} else {
-				log.Println("row exists")
+				fmt.Println(upsertedMutantCandidate)
 			}
 		}()
 	}
