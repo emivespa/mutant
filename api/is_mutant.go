@@ -10,6 +10,8 @@ const (
 	matchLength      int = 4
 )
 
+// isMutant returns whether a slice of DNA strands corresponds to a mutant as per the spec,
+// or an error if it is malformed.
 func isMutant(dna []string) (bool, error) {
 	if !isValidDna(dna) {
 		return false, errors.New("invalid DNA")
@@ -37,7 +39,8 @@ func isMutant(dna []string) (bool, error) {
 	return false, nil
 }
 
-// isValidDna makes sure all elements of the dna slice are the same length and contain only [ACGT].
+// isValidDna makes the dna slice is valid,
+// meaning all strands are of the same length and contain only [ACGT].
 func isValidDna(dna []string) bool {
 	pattern := "^[ACGT]+$"
 	regExp := regexp.MustCompile(pattern)
@@ -52,6 +55,11 @@ func isValidDna(dna []string) bool {
 	return true
 }
 
+// checkLine recieves a pointer to the DNA strand slice
+// and returns whether it finds the charactes are all identical in a straight line.
+// Start is determined by parameters i and j.
+// Direction is determined by iOffset and jOffset.
+// Length is determined by matchLength.
 func checkLine(dnaPtr *[]string, i, j, iOffset, jOffset int) bool {
 	for k := 1; k < matchLength; k++ {
 		if (*dnaPtr)[i][j] != (*dnaPtr)[i+iOffset*k][j+jOffset*k] {

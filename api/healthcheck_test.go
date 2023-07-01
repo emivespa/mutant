@@ -7,15 +7,25 @@ import (
 )
 
 func TestHealthcheckHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/", nil)
-	if err != nil {
-		t.Fatal(err)
+	tests := []struct {
+		method     string
+		statusCode int
+	}{
+		{"GET", http.StatusOK},
+		{"POST", http.StatusMethodNotAllowed},
 	}
 
-	recorder := httptest.NewRecorder()
-	healthcheckHandler(recorder, req)
+	for _, test := range tests {
+		req, err := http.NewRequest(test.method, "/", nil)
+		if err != nil {
+			t.Fatal(err)
+		}
 
-	if recorder.Code != http.StatusOK {
-		t.Errorf("expected status code %d, but got %d", http.StatusOK, recorder.Code)
+		recorder := httptest.NewRecorder()
+		healthcheckHandler(recorder, req)
+
+		if recorder.Code != test.statusCode {
+			t.Errorf("for %s expected %d and got %d", test.method, test.statusCode, recorder.Code)
+		}
 	}
 }

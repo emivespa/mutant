@@ -2,57 +2,52 @@ package main
 
 import "testing"
 
-func TestForFalsePositives(t *testing.T) {
-	dna := []string{
-		"ACACAC",
-		"GTGTGT",
-		"ACACAC",
-		"GTGTGT",
-		"ACACAC",
-		"GTGTGT",
+func TestIsValidDna(t *testing.T) {
+	tests := []struct {
+		validity bool
+		dna      []string
+	}{
+		{false, []string{"ACACAC", "GTGT", "ACACAC", "GTGTGT", "ACACAC", "GTGTGT"}},
+		{false, []string{"ACACAC", "XXXXXX", "ACACAC", "GTGTGT", "ACACAC", "GTGTGT"}},
+		{true, []string{"ACACAC", "GTGTGT", "ACACAC", "GTGTGT", "ACACAC", "GTGTGT"}},
 	}
-	isMutantDna, err := isMutant(dna)
-	if err != nil {
-		t.Errorf("")
-	}
-	if isMutantDna {
-		t.Errorf("")
-	}
-}
-
-func TestBestCase(t *testing.T) {
-	dna := []string{
-		"AAAAAC",
-		"GTGTGT",
-		"ACACAC",
-		"GTGTGT",
-		"ACACAC",
-		"GTGTGT",
-	}
-	isMutantDna, err := isMutant(dna)
-	if err != nil {
-		t.Errorf("")
-	}
-	if !isMutantDna {
-		t.Errorf("")
+	for i, test := range tests {
+		validity := isValidDna(test.dna)
+		if validity != test.validity {
+			t.Errorf("for test %d expected %t and got %t", i, test.validity, validity)
+		}
 	}
 }
 
-func TestWorstCase(t *testing.T) {
-	dna := []string{
-		"ACACAC",
-		"GTGTCT",
-		"ACACAC",
-		"GTCTGT",
-		"ACACAC",
-		"GTGTGT",
+func TestIsMutant(t *testing.T) {
+	tests := []struct {
+		isMutantDna bool
+		isError     bool
+		dna         []string
+	}{
+		{false, false, []string{"ACACAC", "GTGTGT", "ACACAC", "GTGTGT", "ACACAC", "GTGTGT"}},
+		{true, false, []string{"AAAAAC", "GTGTGT", "ACACAC", "GTGTGT", "ACACAC", "GTGTGT"}},
+		{true, false, []string{"ACACAC", "GTGTCT", "ACACAC", "GTCTGT", "ACACAC", "GTGTGT"}},
+		// Bigger:
+		{false, false, []string{"ACACACACA", "GTGTGTGTG", "ACACACACA", "GTGTGTGTG", "ACACACACA", "GTGTGTGTG", "ACACACACA", "GTGTGTGTG"}},
+		// Smaller:
+		{false, false, []string{"ACAC", "GTGT", "ACAC", "GTGT"}},
+		{true, false, []string{"ACAG", "GAGT", "AGAC", "GTGA"}},
+		// Errors:
+		{false, true, []string{"ACACAC", "GTGT", "ACACAC", "GTGTGT", "ACACAC", "GTGTGT"}},
+		{false, true, []string{"ACACAC", "XXXXXX", "ACACAC", "GTGTGT", "ACACAC", "GTGTGT"}},
 	}
-	isMutantDna, err := isMutant(dna)
-	if err != nil {
-		t.Errorf("")
-	}
-	if !isMutantDna {
-		t.Errorf("")
+	for i, test := range tests {
+		isMutantDna, err := isMutant(test.dna)
+		if test.isError {
+			if err == nil {
+				t.Errorf("for test %d expected error and got nil", i)
+			}
+		} else {
+			if isMutantDna != test.isMutantDna {
+				t.Errorf("for test %d expected %t and got %t", i, test.isMutantDna, isMutantDna)
+			}
+		}
 	}
 }
 
@@ -108,86 +103,6 @@ func TestCheckContradiagonals(t *testing.T) {
 		"GTGTGT",
 	}
 	if checkContradiagonals(dna, mutantThreshhold) != 0 {
-		t.Errorf("")
-	}
-}
-
-func TestSillyHuman(t *testing.T) {
-	dna := []string{
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-	}
-	isMutantDna, err := isMutant(dna)
-	if err != nil {
-		t.Errorf("")
-	}
-	if isMutantDna {
-		t.Errorf("")
-	}
-}
-
-func TestSillyMutant(t *testing.T) {
-	dna := []string{
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTCTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-		"ACACACACACACACACACACACACACACACACACAC",
-		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
-	}
-	isMutantDna, err := isMutant(dna)
-	if err != nil {
-		t.Errorf("")
-	}
-	if !isMutantDna {
-		t.Errorf("")
-	}
-}
-
-func TestTinyHuman(t *testing.T) {
-	dna := []string{
-		"ACAC",
-		"GTGT",
-		"ACAC",
-		"GTGT",
-	}
-	isMutantDna, err := isMutant(dna)
-	if err != nil {
-		t.Errorf("")
-	}
-	if isMutantDna {
-		t.Errorf("")
-	}
-}
-
-func TestTinyMutant(t *testing.T) {
-	dna := []string{
-		"ACAG",
-		"GAGT",
-		"AGAC",
-		"GTGA",
-	}
-	isMutantDna, err := isMutant(dna)
-	if err != nil {
-		t.Errorf("")
-	}
-	if !isMutantDna {
 		t.Errorf("")
 	}
 }
