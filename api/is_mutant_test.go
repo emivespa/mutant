@@ -11,7 +11,11 @@ func TestForFalsePositives(t *testing.T) {
 		"ACACAC",
 		"GTGTGT",
 	}
-	if IsMutant(dna) {
+	isMutantDna, err := isMutant(dna)
+	if err != nil {
+		t.Errorf("")
+	}
+	if isMutantDna {
 		t.Errorf("")
 	}
 }
@@ -25,7 +29,11 @@ func TestBestCase(t *testing.T) {
 		"ACACAC",
 		"GTGTGT",
 	}
-	if !IsMutant(dna) {
+	isMutantDna, err := isMutant(dna)
+	if err != nil {
+		t.Errorf("")
+	}
+	if !isMutantDna {
 		t.Errorf("")
 	}
 }
@@ -39,7 +47,11 @@ func TestWorstCase(t *testing.T) {
 		"ACACAC",
 		"GTGTGT",
 	}
-	if !IsMutant(dna) {
+	isMutantDna, err := isMutant(dna)
+	if err != nil {
+		t.Errorf("")
+	}
+	if !isMutantDna {
 		t.Errorf("")
 	}
 }
@@ -115,7 +127,11 @@ func TestSillyHuman(t *testing.T) {
 		"ACACACACACACACACACACACACACACACACACAC",
 		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
 	}
-	if IsMutant(dna) {
+	isMutantDna, err := isMutant(dna)
+	if err != nil {
+		t.Errorf("")
+	}
+	if isMutantDna {
 		t.Errorf("")
 	}
 }
@@ -135,7 +151,11 @@ func TestSillyMutant(t *testing.T) {
 		"ACACACACACACACACACACACACACACACACACAC",
 		"GTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGTGT",
 	}
-	if !IsMutant(dna) {
+	isMutantDna, err := isMutant(dna)
+	if err != nil {
+		t.Errorf("")
+	}
+	if !isMutantDna {
 		t.Errorf("")
 	}
 }
@@ -147,7 +167,11 @@ func TestTinyHuman(t *testing.T) {
 		"ACAC",
 		"GTGT",
 	}
-	if IsMutant(dna) {
+	isMutantDna, err := isMutant(dna)
+	if err != nil {
+		t.Errorf("")
+	}
+	if isMutantDna {
 		t.Errorf("")
 	}
 }
@@ -159,7 +183,11 @@ func TestTinyMutant(t *testing.T) {
 		"AGAC",
 		"GTGA",
 	}
-	if !IsMutant(dna) {
+	isMutantDna, err := isMutant(dna)
+	if err != nil {
+		t.Errorf("")
+	}
+	if !isMutantDna {
 		t.Errorf("")
 	}
 }

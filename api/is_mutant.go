@@ -1,31 +1,55 @@
 package main
 
+import (
+	"errors"
+	"regexp"
+)
+
 const (
 	mutantThreshhold int = 2
 	matchLength      int = 4
 )
 
-func IsMutant(dna []string) bool {
+func isMutant(dna []string) (bool, error) {
+	if !isValidDna(dna) {
+		return false, errors.New("invalid DNA")
+	}
+
 	strandsLeft := mutantThreshhold
 
 	strandsLeft = checkRows(dna, strandsLeft)
 	if strandsLeft == 0 {
-		return true
+		return true, nil
 	}
 	strandsLeft = checkColumns(dna, strandsLeft)
 	if strandsLeft == 0 {
-		return true
+		return true, nil
 	}
 	strandsLeft = checkDiagonals(dna, strandsLeft)
 	if strandsLeft == 0 {
-		return true
+		return true, nil
 	}
 	strandsLeft = checkContradiagonals(dna, strandsLeft)
 	if strandsLeft == 0 {
-		return true
+		return true, nil
 	}
 
-	return false
+	return false, nil
+}
+
+// isValidDna makes sure all elements of the dna slice are the same length and contain only [ACGT].
+func isValidDna(dna []string) bool {
+	pattern := "^[ACGT]+$"
+	regExp := regexp.MustCompile(pattern)
+	for _, v := range dna {
+		if len(dna[0]) != len(v) {
+			return false
+		}
+		if !regExp.MatchString(v) {
+			return false
+		}
+	}
+	return true
 }
 
 func checkLine(dnaPtr *[]string, i, j, iOffset, jOffset int) bool {

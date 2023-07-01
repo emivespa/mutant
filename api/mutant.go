@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -23,13 +22,17 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 		err := json.NewDecoder(r.Body).Decode(&req)
 		if err != nil {
 			log.Println("Failed to decode JSON:", err)
-			w.WriteHeader(http.StatusInternalServerError)
+			w.WriteHeader(http.StatusUnprocessableEntity)
 			return
 		}
 
-		isMutant := IsMutant(req.Dna)
+		isMutantDna, err := isMutant(req.Dna)
+		if err != nil {
+			w.WriteHeader(http.StatusUnprocessableEntity)
+			return
+		}
 
-		if isMutant {
+		if isMutantDna {
 			w.WriteHeader(http.StatusOK)
 		} else {
 			w.WriteHeader(http.StatusForbidden)
@@ -48,12 +51,12 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 				db.MutantCandidate.DnaString.Equals(string(dnaString)),
 			).Create(
 				db.MutantCandidate.DnaString.Set(string(dnaString)),
-				db.MutantCandidate.IsMutant.Set(isMutant),
+				db.MutantCandidate.IsMutant.Set(isMutantDna),
 			).Update().Exec(opCtx)
 			if err != nil {
 				log.Printf("error occurred: %s", err)
 			} else {
-				fmt.Println(upsertedMutantCandidate)
+				log.Println(upsertedMutantCandidate)
 			}
 		}()
 	}
