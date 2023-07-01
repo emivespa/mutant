@@ -17,6 +17,7 @@ RUN go get -d -v ./...
 
 RUN go run github.com/steebchen/prisma-client-go generate
 
+RUN go test ./api
 RUN go build -o main ./api
 
 EXPOSE 8080
