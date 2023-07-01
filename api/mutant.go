@@ -44,20 +44,20 @@ func mutantHandler(client *db.PrismaClient, ctx context.Context) func(w http.Res
 		}
 		dnaString := string(dnaBytes)
 
-		go func() {
-			opCtx, cancel := context.WithTimeout(ctx, time.Second*10)
+		opCtx, cancel := context.WithTimeout(ctx, time.Second*10)
+		go func(ctx context.Context, cancel context.CancelFunc) {
 			defer cancel()
 			upsertedMutantCandidate, err := client.MutantCandidate.UpsertOne(
 				db.MutantCandidate.DnaString.Equals(string(dnaString)),
 			).Create(
 				db.MutantCandidate.DnaString.Set(string(dnaString)),
 				db.MutantCandidate.IsMutant.Set(isMutantDna),
-			).Update().Exec(opCtx)
+			).Update().Exec(ctx)
 			if err != nil {
 				log.Printf("error occurred: %s", err)
 			} else {
 				log.Println(upsertedMutantCandidate)
 			}
-		}()
+		}(opCtx, cancel)
 	}
 }
