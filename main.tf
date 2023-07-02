@@ -13,9 +13,6 @@ terraform {
 
 # # planetscale ##################################################################
 
-# variable "PLANETSCALE_SERVICE_TOKEN_ID" {} # See env.example.
-# variable "PLANETSCALE_SERVICE_TOKEN" {}    # See env.example.
-
 provider "planetscale" {
   service_token_id = var.PLANETSCALE_SERVICE_TOKEN_ID
   service_token    = var.PLANETSCALE_SERVICE_TOKEN
@@ -25,10 +22,6 @@ resource "planetscale_database" "db" {
   organization = "emivespa"
   name         = "db"
 }
-
-# output "planetscale_database_html_url" {
-#   value = planetscale_database.db.html_url
-# }
 
 # aws ##########################################################################
 
@@ -46,9 +39,6 @@ resource "aws_ecrpublic_repository" "mutant" {
   provider        = aws.us_east_1
   repository_name = "mutant"
 }
-# output "mutant_ecr_uri" {
-#   value = aws_ecrpublic_repository.mutant.repository_uri
-# }
 
 # ECR cluster config mostly from here:
 # <https://earthly.dev/blog/deploy-dockcontainers-to-awsecs-using-terraform/>
@@ -58,8 +48,6 @@ resource "aws_ecrpublic_repository" "mutant" {
 resource "aws_ecs_cluster" "mutant" {
   name = "mutant"
 }
-
-# variable "DATABASE_URL" {} # See env.example.
 
 # task
 resource "aws_ecs_task_definition" "app_task" {
@@ -201,7 +189,3 @@ resource "aws_security_group" "service_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-# output "app_url" {
-#   value = aws_alb.application_load_balancer.dns_name
-# }
