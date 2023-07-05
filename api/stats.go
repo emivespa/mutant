@@ -34,6 +34,7 @@ func statsHandler(client *db.PrismaClient, ctx context.Context) func(w http.Resp
 		}
 		log.Println(countResult)
 
+		// True comes before false:
 		mutantCountStr := countResult[0]["count(*)"].(string)
 		humanCountStr := countResult[1]["count(*)"].(string)
 		mutantCount, _ := strconv.Atoi(mutantCountStr)
