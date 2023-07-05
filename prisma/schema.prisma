@@ -15,7 +15,7 @@ generator db {
 }
 
 model MutantCandidate {
-  id        Int     @id @default(autoincrement())
-  dnaString String  @unique
-  isMutant  Boolean
+  id       Int    @id @default(autoincrement())
+  dna      String @unique
+  isMutant Boolean
 }
