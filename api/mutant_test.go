@@ -14,18 +14,14 @@ import (
 
 func TestMutantHandler(t *testing.T) {
 	tests := []struct {
-		code int
-		req  Request
+		method string
+		code   int
+		req    Request
 	}{
-		{
-			http.StatusOK, Request{Dna: []string{"AAAAAA", "CAGTGC", "TTATTT", "AGACGG", "GCGTCA", "TCACTG"}},
-		},
-		{
-			http.StatusForbidden, Request{Dna: []string{"ATGCGA", "CAGTGC", "TTATTT", "AGACGG", "GCGTCA", "TCACTG"}},
-		},
-		{
-			http.StatusUnprocessableEntity, Request{Dna: []string{"XXXXXX", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}},
-		},
+		{"POST", http.StatusOK, Request{Dna: []string{"AAAAAA", "CAGTGC", "TTATTT", "AGACGG", "GCGTCA", "TCACTG"}}},
+		{"POST", http.StatusForbidden, Request{Dna: []string{"ATGCGA", "CAGTGC", "TTATTT", "AGACGG", "GCGTCA", "TCACTG"}}},
+		{"POST", http.StatusUnprocessableEntity, Request{Dna: []string{"XXXXXX", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}}},
+		{"GET", http.StatusMethodNotAllowed, Request{Dna: []string{"AAAAAA", "CAGTGC", "TTATTT", "AGACGG", "GCGTCA", "TCACTG"}}},
 	}
 
 	for i, test := range tests {
@@ -39,6 +35,20 @@ func TestMutantHandler(t *testing.T) {
 		}
 		dna := string(dnaBytes)
 		isMutantDna := test.code == http.StatusOK
+
+		reqBytes, _ := json.Marshal(test.req)
+		req, err := http.NewRequest(test.method, "", bytes.NewReader(reqBytes))
+		if err != nil {
+			t.Fatal(err)
+		}
+		recorder := httptest.NewRecorder()
+		handler := mutantHandler(client, ctx)
+		handler(recorder, req)
+		if recorder.Code != test.code {
+			t.Errorf("for test %d expected %d and got %d", i, test.code, recorder.Code)
+		}
+
+		// Test the DB processing:
 
 		expected := &db.MutantCandidateModel{
 			InnerMutantCandidate: db.InnerMutantCandidate{
@@ -60,18 +70,6 @@ func TestMutantHandler(t *testing.T) {
 		opCtx, cancel := context.WithTimeout(ctx, time.Second*10)
 		if err := processMutantCandidate(client, opCtx, cancel, dna, isMutantDna); err != nil {
 			t.Errorf("processMutantCandidate failed")
-		}
-
-		reqBytes, _ := json.Marshal(test.req)
-		req, err := http.NewRequest(http.MethodPost, "", bytes.NewReader(reqBytes))
-		if err != nil {
-			t.Fatal(err)
-		}
-		recorder := httptest.NewRecorder()
-		handler := mutantHandler(client, ctx)
-		handler(recorder, req)
-		if recorder.Code != test.code {
-			t.Errorf("for test %d expected %d and got %d", i, test.code, recorder.Code)
 		}
 	}
 }
