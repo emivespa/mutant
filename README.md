@@ -51,6 +51,5 @@ Won't work without a running DB.
 
 - should have gone with Gorm as opposed to Prisma
 - <80% test coverage.
-  - Currently missing is proper DB mocking.
-  - Wouldn't actually stop us from testing the http response,
-  - but makes `go test -cover` panic.
+  - ~No DB mocking means we can test the http response but code coverage tools will panic.~
+    - (solved)
