@@ -3,14 +3,12 @@
 [Challenge found here](https://github.com/mauricionrgarcia/examen-mercadolibre-mutante)
 (see README).
 
-## IsMutant method
-
-### Efficiency notes
+## isMutant method
 
 - Simplest possible implementation that works for arbitrary matrix size and match length.
-- We don't do an initial pass to collect all possible 4-tuples.
-- All checks are done in place.
-- We always return early as soon as possible.
+  - We don't do an initial pass to collect all possible 4-tuples.
+  - All checks are done in place.
+  - We always return early as soon as possible.
 - Not currently parallelized, as I didn't want to make it too fancy or Golang-specific,
   but would be trivial to run the 4 directional passes at the same time.
 
