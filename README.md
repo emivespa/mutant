@@ -7,19 +7,16 @@
 
 ### Efficiency notes
 
-- We don't do an initial pass to collect al possible n-tuples.
-- ~All checks are done in place.~
-  - Excuse me, all checks _could_ be done in place,
-    if we were ok with replacing the `checkLine` function with a fixed-length check like this:
-    ```go
-    if [i][j] == [i][j+1] && [i][j] == [i][j+2] && [i][j] == [i][j+2]
-    ```
+- Simplest possible implementation that works for arbitrary matrix size and match length.
+- We don't do an initial pass to collect all possible 4-tuples.
+- All checks are done in place.
 - We always return early as soon as possible.
+- Not currently parallelized, as I didn't want to make it too fancy or Golang-specific,
+  but would be trivial to run the 4 directional passes at the same time.
 
 ## REST API
 
 - Go http server running on ECS.
-  - Might convert it to a Lambda soon.
   - Currently hosted at:
     - `http://mutant.emivespa.com/stats`
     - `http://mutant.emivespa.com/mutant`
@@ -35,20 +32,25 @@ so you can run:
 
 - `make build` and then
 - `make run`
-- `make push`
 
 There are also convenience recipes for hitting container endpoints:
 
 - `make 200` for a mutant
 - `make 403` for a non-mutant
-- `make random` for random dna
-- `make healthcheck`
+- `make random` for random 6x6 dna
+- `make healthcheck` for `/`
 - `make stats`
 
-For now, won't work without a running DB.
+Won't work without a running DB.
 
 ## DB
 
 - Using Planetscale because setting up RDS would be a distraction.
-- ~Might be the shoddiest part of this, it's my first time using Prisma with Golang.~
-- single DB query for both /mutant and /stats
+
+## Known issues
+
+- should have gone with Gorm as opposed to Prisma
+- <80% test coverage.
+  - Currently missing is proper DB mocking.
+  - Wouldn't actually stop us from testing the http response,
+  - but makes `go test -cover` panic.
